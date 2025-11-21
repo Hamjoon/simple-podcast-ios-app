@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김혜리의 필름클럽</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>김혜리의 필름클럽</h1>
+            <p class="subtitle">영화와 음악에 대한 이야기</p>
+        </header>
+
+        <main>
+            <div class="player-container">
+                <div class="now-playing">
+                    <img id="episode-image" src="https://image.cloud.sbs.co.kr/2024/06/05/Yqc1717550363234.jpg" alt="Episode artwork">
+                    <div class="episode-info">
+                        <h2 id="episode-title">에피소드를 선택하세요</h2>
+                        <p id="episode-description"></p>
+                    </div>
+                </div>
+
+                <div class="audio-controls">
+                    <audio id="audio-player" controls>
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+
+            <div class="episodes-list">
+                <h3>Episodes</h3>
+                <div id="episodes-container"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
