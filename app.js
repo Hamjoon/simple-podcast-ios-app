@@ -1,48 +1,9 @@
-// Podcast episodes data from 김혜리의 필름클럽 (Kim Hye-ri's Film Club)
-// RSS Feed: https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml
-const podcastData = {
-    episodes: [
-        {
-            id: 1,
-            title: "부고니아",
-            description: "요르고스 란티모스의 신작 '부고니아'에 대한 이야기와 김혜리 기자의 새로운 칼럼 연재 소식",
-            audioUrl: "http://podcastdown.sbs.co.kr/powerfm/2025/11/podcast-v2000010143-20251118-1763083508347.mp3",
-            imageUrl: "https://image.cloud.sbs.co.kr/2024/06/05/Yqc1717550363234.jpg",
-            duration: "01:21:09"
-        },
-        {
-            id: 2,
-            title: "밀린 수다",
-            description: "지난 두 달간 쌓인 청취자 사연 공유 에피소드",
-            audioUrl: "http://podcastdown.sbs.co.kr/powerfm/2025/11/podcast-v2000010143-20251110-1762740994999.mp3",
-            imageUrl: "https://image.cloud.sbs.co.kr/2024/06/05/Yqc1717550363234.jpg",
-            duration: "00:53:17"
-        },
-        {
-            id: 3,
-            title: "세계의 주인 with 윤가은 감독",
-            description: "윤가은 감독과의 100분을 채운 상세 대화 세션",
-            audioUrl: "http://podcastdown.sbs.co.kr/powerfm/2025/10/podcast-v2000010143-20251027-1761107893693.mp3",
-            imageUrl: "https://image.cloud.sbs.co.kr/2024/06/05/Yqc1717550363234.jpg",
-            duration: "01:38:04"
-        },
-        {
-            id: 4,
-            title: "원 배틀 애프터 어나더",
-            description: "영화 이야기로만 82분, 그 중 음악 이야기는 29분",
-            audioUrl: "http://podcastdown.sbs.co.kr/powerfm/2025/10/podcast-v2000010143-20251017-1760690866827.mp3",
-            imageUrl: "https://image.cloud.sbs.co.kr/2024/06/05/Yqc1717550363234.jpg",
-            duration: "01:26:21"
-        },
-        {
-            id: 5,
-            title: "어쩔수가없다 with 박찬욱 감독",
-            description: "박찬욱 감독과의 신작 상세 대담, 연기 디렉션 및 음악 선호도 논의",
-            audioUrl: "http://podcastdown.sbs.co.kr/powerfm/2025/10/podcast-v2000010143-20251001-1759286133458.mp3",
-            imageUrl: "https://image.cloud.sbs.co.kr/2024/06/05/Yqc1717550363234.jpg",
-            duration: "01:50:54"
-        }
-    ]
+// Configuration
+const API_BASE_URL = 'http://localhost:5001';
+
+// Podcast episodes data - will be fetched from API
+let podcastData = {
+    episodes: []
 };
 
 // State management
@@ -55,9 +16,41 @@ const episodeDescription = document.getElementById('episode-description');
 const episodeImage = document.getElementById('episode-image');
 const episodesContainer = document.getElementById('episodes-container');
 
+// Fetch episodes from API
+async function fetchEpisodes() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/episodes`);
+        const data = await response.json();
+
+        if (data.success && data.episodes) {
+            podcastData.episodes = data.episodes;
+            renderEpisodes();
+        } else {
+            console.error('Failed to load episodes:', data.error);
+            showError('Failed to load episodes. Please try again later.');
+        }
+    } catch (error) {
+        console.error('Error fetching episodes:', error);
+        showError('Unable to connect to the server. Please check if the API server is running.');
+    }
+}
+
+// Show error message
+function showError(message) {
+    episodesContainer.innerHTML = `
+        <div style="padding: 20px; text-align: center; color: #666;">
+            <p>${message}</p>
+        </div>
+    `;
+}
+
 // Initialize the app
-function init() {
-    renderEpisodes();
+async function init() {
+    // Show loading state
+    episodesContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Loading episodes...</div>';
+
+    // Fetch episodes from API
+    await fetchEpisodes();
 }
 
 // Render all episodes in the list
