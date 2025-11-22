@@ -151,3 +151,21 @@ const API_BASE_URL = 'http://localhost:5001';
 ```
 
 **Note:** Port 5000 is often used by AirPlay Receiver on macOS, so we use port 5001 by default.
+
+## Deployment
+
+### Deploy to Railway.app
+
+For production deployment with 24/7 availability, see **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed Railway.app deployment instructions.
+
+**Quick steps:**
+1. Push code to GitHub
+2. Connect GitHub repo to Railway.app
+3. Railway auto-deploys with `Procfile` and `railway.json`
+4. Update `app.js` with your Railway URL
+
+Railway provides:
+- Free $5 monthly credit (~500 hours)
+- Automatic HTTPS
+- Auto-deploy on git push
+- Built-in monitoring and logs

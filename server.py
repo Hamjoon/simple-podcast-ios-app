@@ -9,6 +9,7 @@ from flask_cors import CORS
 import feedparser
 from datetime import datetime
 import time
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -159,4 +160,9 @@ def index():
 if __name__ == '__main__':
     print("Starting Flask server...")
     print(f"RSS Feed URL: {RSS_FEED_URL}")
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    
+    # Get port from environment variable (Railway sets this) or default to 5001
+    port = int(os.environ.get('PORT', 5001))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    
+    app.run(host='0.0.0.0', port=port, debug=debug)
