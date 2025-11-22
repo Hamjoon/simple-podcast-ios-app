@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = 'https://simple-podcast-production.up.railway.app';
 
 // Podcast episodes data - will be fetched from API
 let podcastData = {
