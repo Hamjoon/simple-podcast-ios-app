@@ -9,6 +9,10 @@ let podcastData = {
 // State management
 let currentEpisode = null;
 
+// Sleep timer state
+let sleepTimerInterval = null;
+let sleepTimerEndTime = null;
+
 // DOM elements
 const audioPlayer = document.getElementById('audio-player');
 const episodeTitle = document.getElementById('episode-title');
@@ -126,5 +130,118 @@ audioPlayer.addEventListener('ended', () => {
     }
 });
 
+// ===== Sleep Timer Functions =====
+
+// Start sleep timer with specified minutes
+function startSleepTimer(minutes) {
+    // Clear any existing timer
+    stopSleepTimer();
+
+    // Calculate end time
+    sleepTimerEndTime = Date.now() + (minutes * 60 * 1000);
+
+    // Get DOM elements
+    const timerDisplay = document.getElementById('timer-display');
+    const timerCountdown = document.getElementById('timer-countdown');
+    const timerPresets = document.querySelector('.timer-presets');
+
+    // Show timer display and hide preset buttons
+    timerDisplay.style.display = 'flex';
+    timerPresets.style.display = 'none';
+
+    // Update display immediately
+    updateTimerDisplay();
+
+    // Update every second
+    sleepTimerInterval = setInterval(() => {
+        updateTimerDisplay();
+
+        // Check if timer has expired
+        const remaining = sleepTimerEndTime - Date.now();
+        if (remaining <= 0) {
+            handleTimerComplete();
+        }
+    }, 1000);
+}
+
+// Stop sleep timer
+function stopSleepTimer() {
+    if (sleepTimerInterval) {
+        clearInterval(sleepTimerInterval);
+        sleepTimerInterval = null;
+    }
+
+    sleepTimerEndTime = null;
+
+    // Reset UI
+    const timerDisplay = document.getElementById('timer-display');
+    const timerPresets = document.querySelector('.timer-presets');
+
+    if (timerDisplay && timerPresets) {
+        timerDisplay.style.display = 'none';
+        timerPresets.style.display = 'flex';
+    }
+}
+
+// Update timer countdown display
+function updateTimerDisplay() {
+    const timerCountdown = document.getElementById('timer-countdown');
+
+    if (!sleepTimerEndTime || !timerCountdown) return;
+
+    const remaining = Math.max(0, sleepTimerEndTime - Date.now());
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+
+    timerCountdown.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Handle timer completion
+function handleTimerComplete() {
+    // Pause the audio
+    audioPlayer.pause();
+
+    // Stop the timer
+    stopSleepTimer();
+
+    // Optional: Show notification (if browser supports it)
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Sleep Timer', {
+            body: 'Playback stopped - sleep well!',
+            icon: episodeImage.src
+        });
+    }
+}
+
+// Initialize sleep timer controls
+function initSleepTimer() {
+    // Add event listeners to preset buttons
+    const timerButtons = document.querySelectorAll('.timer-btn');
+    timerButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const minutes = parseInt(btn.dataset.minutes);
+            startSleepTimer(minutes);
+        });
+    });
+
+    // Add event listener to cancel button
+    const cancelButton = document.getElementById('timer-cancel');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', stopSleepTimer);
+    }
+
+    // Request notification permission (optional)
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
 // Start the app
 init();
+
+// Initialize sleep timer after DOM is loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSleepTimer);
+} else {
+    initSleepTimer();
+}
