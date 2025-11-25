@@ -170,7 +170,7 @@ class AudioPlayerService: ObservableObject {
     /// Skip forward by specified seconds
     /// - Parameter seconds: Number of seconds to skip forward
     func skipForward(seconds: Double) {
-        guard let player = player else { return }
+        guard player != nil else { return }
         let newTime = currentTime + seconds
         let clampedTime = min(newTime, duration)
         seek(to: clampedTime)
@@ -179,7 +179,7 @@ class AudioPlayerService: ObservableObject {
     /// Skip backward by specified seconds
     /// - Parameter seconds: Number of seconds to skip backward
     func skipBackward(seconds: Double) {
-        guard let player = player else { return }
+        guard player != nil else { return }
         let newTime = max(0, currentTime - seconds)
         seek(to: newTime)
     }
@@ -189,7 +189,9 @@ class AudioPlayerService: ObservableObject {
     func seek(to time: TimeInterval) {
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
         player?.seek(to: cmTime) { [weak self] _ in
-            self?.updateNowPlayingInfo()
+            Task { @MainActor in
+                self?.updateNowPlayingInfo()
+            }
         }
     }
 
@@ -221,10 +223,13 @@ class AudioPlayerService: ObservableObject {
     private func setupTimeObserver() {
         let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
         timeObserver = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
-            guard let self = self else { return }
-            self.currentTime = time.seconds
-            if self.duration > 0 {
-                self.progress = self.currentTime / self.duration
+            let seconds = time.seconds
+            Task { @MainActor in
+                guard let self = self else { return }
+                self.currentTime = seconds
+                if self.duration > 0 {
+                    self.progress = self.currentTime / self.duration
+                }
             }
         }
     }
