@@ -1,171 +1,68 @@
-# Simple Podcast Web Player
+# Simple Podcast iOS App
 
-A podcast web application for "김혜리의 필름클럽" (Kim Hye-ri's Film Club) with a Python Flask backend API that fetches episodes from an external RSS feed.
+iOS 팟캐스트 앱 - "김혜리의 필름클럽" (Kim Hye-ri's Film Club)
 
-## Architecture
-
-### Frontend (Static Web App)
-- **index.html** - Main UI structure
-- **styles.css** - Responsive styling with gradient design
-- **app.js** - JavaScript application logic with API integration
-
-### Backend (Flask API Server)
-- **server.py** - Flask API server that fetches and parses RSS feed
-- Fetches from: `https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml`
-- Provides REST API at `http://localhost:5001/api/episodes`
-- Includes 5-minute caching to reduce external requests
-
-## Setup and Installation
-
-### Prerequisites
-- Python 3.7 or higher
-- A web browser
-
-### 1. Install Python Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-This installs:
-- Flask - Web framework
-- flask-cors - CORS support for API
-- feedparser - RSS feed parsing
-
-### 2. Start the API Server
-
-```bash
-python server.py
-```
-
-The server will start on `http://localhost:5001`
-
-You should see:
-```
-Starting Flask server...
-RSS Feed URL: https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml
- * Running on http://0.0.0.0:5001
-```
-
-### 3. Open the Frontend
-
-Open `index.html` in your web browser:
-
-**Option 1: Direct file access**
-```bash
-open index.html
-```
-
-**Option 2: Using a local server (recommended to avoid CORS issues)**
-```bash
-# Python
-python -m http.server 8000
-
-# or Node.js
-npx serve
-```
-
-Then visit `http://localhost:8000` in your browser.
-
-## API Endpoints
-
-### GET /api/episodes
-Returns all podcast episodes from the RSS feed.
-
-**Response:**
-```json
-{
-  "success": true,
-  "episodes": [
-    {
-      "id": 1,
-      "title": "Episode Title",
-      "description": "Episode description",
-      "audioUrl": "http://...",
-      "imageUrl": "http://...",
-      "duration": "01:30:00",
-      "pubDate": "Mon, 18 Nov 2024 00:00:00 GMT"
-    }
-  ],
-  "count": 10
-}
-```
-
-### GET /api/health
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "timestamp": "2024-11-22T10:30:00"
-}
-```
+SBS RSS 피드에서 팟캐스트 에피소드를 가져와 재생하는 간단한 iOS 앱입니다.
 
 ## Features
 
-- **Live RSS Feed** - Episodes are fetched from the external SBS RSS feed
-- **Auto-refresh** - Backend caches data for 5 minutes, then refetches
-- **Auto-play Next** - Automatically plays next episode when current ends
-- **Responsive Design** - Works on desktop and mobile devices
-- **Visual Feedback** - Highlights currently playing episode
+- RSS 피드에서 에피소드 목록 자동 로드
+- 오디오 스트리밍 재생
+- 백그라운드 오디오 지원
+- 다음 에피소드 자동 재생
+- 재생 진행률 표시
 
-## Troubleshooting
+## Requirements
 
-### "Unable to connect to the server"
-- Make sure the Flask server is running (`python server.py`)
-- Check that the server is accessible at `http://localhost:5001`
+- iOS 15.0+
+- Xcode 15.0+
+- Swift 5.0+
 
-### CORS Errors
-- The Flask server has CORS enabled
-- If using file:// protocol, serve the frontend via HTTP instead (use `python -m http.server`)
+## Architecture
 
-### No Episodes Loading
-- Check the Flask server console for error messages
-- Verify the RSS feed URL is accessible
-- The server will log fetching attempts and parsing results
-
-## Development
-
-### Modifying the RSS Feed Source
-Edit `server.py` line 15:
-```python
-RSS_FEED_URL = "your-rss-feed-url-here"
+```
+SimplePodcast/
+├── Models/
+│   └── Episode.swift          # 에피소드 데이터 모델
+├── Services/
+│   └── RSSService.swift       # RSS 피드 파싱
+├── ViewModels/
+│   └── PodcastViewModel.swift # 상태 관리
+└── Views/
+    ├── ContentView.swift      # 메인 뷰
+    ├── EpisodeListView.swift  # 에피소드 목록
+    └── PlayerView.swift       # 오디오 플레이어
 ```
 
-### Adjusting Cache Duration
-Edit `server.py` line 21:
-```python
-'cache_duration': 300  # Change seconds here
+## Data Source
+
+팟캐스트 에피소드는 SBS RSS 피드에서 가져옵니다:
+- URL: `https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml`
+
+## Getting Started
+
+1. Xcode에서 프로젝트 열기
+2. 시뮬레이터 또는 실제 기기 선택
+3. Build and Run (⌘R)
+
+## Build
+
+```bash
+# 빌드
+xcodebuild -scheme SimplePodcast -configuration Debug build
+
+# 테스트
+xcodebuild test -scheme SimplePodcast -destination 'platform=iOS Simulator,name=iPhone 15'
 ```
 
-### Changing API Port
-Edit `server.py` line 162 and `app.js` line 2:
-```python
-# server.py
-app.run(host='0.0.0.0', port=5001, debug=True)
-```
-```javascript
-// app.js
-const API_BASE_URL = 'http://localhost:5001';
-```
+## Backend Server (별도 프로젝트)
 
-**Note:** Port 5000 is often used by AirPlay Receiver on macOS, so we use port 5001 by default.
+이 저장소에는 레거시 Flask 백엔드 서버 파일이 포함되어 있습니다. 이 파일들은 별도의 프로젝트로 이전될 예정입니다.
 
-## Deployment
+- `server.py` - Flask API 서버
+- `requirements.txt` - Python 의존성
+- `DEPLOYMENT.md` - 배포 가이드
 
-### Deploy to Railway.app
+## License
 
-For production deployment with 24/7 availability, see **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed Railway.app deployment instructions.
-
-**Quick steps:**
-1. Push code to GitHub
-2. Connect GitHub repo to Railway.app
-3. Railway auto-deploys with `Procfile` and `railway.json`
-4. Update `app.js` with your Railway URL
-
-Railway provides:
-- Free $5 monthly credit (~500 hours)
-- Automatic HTTPS
-- Auto-deploy on git push
-- Built-in monitoring and logs
+MIT License

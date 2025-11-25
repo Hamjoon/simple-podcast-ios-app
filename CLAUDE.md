@@ -4,74 +4,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A simple, static podcast web application built with vanilla HTML, CSS, and JavaScript. The app features hardcoded podcast episode data and uses the native HTML `<audio>` element for playback.
+A simple iOS podcast application for "김혜리의 필름클럽" (Kim Hye-ri's Film Club). The app fetches podcast episodes from an external RSS feed and provides audio playback functionality.
 
 ## Architecture
 
-### Core Components
+### Target Platform
+- iOS 15.0+
+- Swift 5.0+
+- SwiftUI for UI components
 
-- **index.html**: Main application structure with player UI and episode list
-- **styles.css**: Responsive styling with gradient background and modern card-based design
-- **app.js**: Application logic, state management, and podcast data
+### Core Components (To Be Implemented)
 
-### Data Structure
+- **Models/Episode.swift**: Data model for podcast episodes
+- **Services/RSSService.swift**: RSS feed fetching and parsing
+- **Views/**: SwiftUI views for player UI and episode list
+- **ViewModels/**: State management with ObservableObject
 
-Podcast episodes are stored as a hardcoded JavaScript object in `app.js`:
-- Each episode contains: `id`, `title`, `description`, `audioUrl`, `imageUrl`, `duration`
-- The `podcastData` object is the single source of truth for all episode information
+### Data Source
 
-### State Management
+Podcast episodes are fetched from the SBS RSS feed:
+- URL: `https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml`
+- Contains episode metadata: title, description, audio URL, image URL, duration, publish date
 
-Simple state tracking via `currentEpisode` variable (app.js:32):
-- Tracks currently playing episode
-- Used for auto-play next feature
-- Updates UI active states
+### Key Features
 
-### Key Functionality
+- RSS feed parsing and episode listing
+- Audio playback with AVFoundation
+- Background audio support
+- Auto-play next episode
+- Episode progress tracking
 
-- **Episode Rendering**: `renderEpisodes()` dynamically generates episode list from data (app.js:43)
-- **Playback Control**: `playEpisode()` handles audio source switching and UI updates (app.js:66)
-- **Auto-Play**: Event listener on audio element advances to next episode on completion (app.js:90)
+## Development
 
-## Running the Application
+### Prerequisites
+- Xcode 15.0+
+- iOS 15.0+ device or simulator
 
-This is a static web application with no build process required.
-
-**Development:**
+### Build Commands
 ```bash
-# Serve locally (any static file server works)
-python -m http.server 8000
-# or
-npx serve
+# Build the project
+xcodebuild -scheme SimplePodcast -configuration Debug build
+
+# Run tests
+xcodebuild test -scheme SimplePodcast -destination 'platform=iOS Simulator,name=iPhone 15'
 ```
 
-Then open `http://localhost:8000` in a browser.
+## Backend API (Legacy)
 
-**Production:**
-Simply open `index.html` directly in a browser, or deploy all three files to any static hosting service.
+A Flask backend server exists in this repository for serving episodes via REST API. This is maintained separately and may be moved to a different project in the future.
 
-## Modifying Podcast Data
-
-To add/edit episodes, modify the `podcastData` object in `app.js` (lines 2-31):
-```javascript
-const podcastData = {
-    episodes: [
-        {
-            id: 1,
-            title: "Episode Title",
-            description: "Episode description",
-            audioUrl: "path/to/audio.mp3",
-            imageUrl: "path/to/image.jpg",
-            duration: "45:30"
-        }
-        // ... more episodes
-    ]
-};
-```
-
-## Styling Customization
-
-Main theme colors defined in `styles.css`:
-- Background gradient: `#667eea` to `#764ba2` (line 9)
-- Active episode highlight: `#667eea` (line 113)
-- Modify these for different color schemes
+- **server.py**: Flask API server
+- **requirements.txt**: Python dependencies
+- See **DEPLOYMENT.md** for deployment instructions
