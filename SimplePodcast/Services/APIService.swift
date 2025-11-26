@@ -11,11 +11,12 @@ actor APIService {
         decoder = JSONDecoder()
     }
 
-    /// Fetches all podcast episodes from the API
+    /// Fetches episodes for a specific podcast from the API
+    /// - Parameter podcastId: The podcast identifier (e.g., "film-club", "taste-of-travel", "seodam")
     /// - Returns: Array of Episode objects
     /// - Throws: APIError if the request fails
-    func fetchEpisodes() async throws -> [Episode] {
-        guard let url = URL(string: "\(baseURL)/api/episodes") else {
+    func fetchEpisodes(for podcastId: String) async throws -> [Episode] {
+        guard let url = URL(string: "\(baseURL)/api/episodes/\(podcastId)") else {
             throw APIError.invalidURL
         }
 
@@ -40,6 +41,13 @@ actor APIService {
         }
 
         return episodes
+    }
+
+    /// Fetches all podcast episodes from the API (default: film-club for backwards compatibility)
+    /// - Returns: Array of Episode objects
+    /// - Throws: APIError if the request fails
+    func fetchEpisodes() async throws -> [Episode] {
+        return try await fetchEpisodes(for: "film-club")
     }
 }
 

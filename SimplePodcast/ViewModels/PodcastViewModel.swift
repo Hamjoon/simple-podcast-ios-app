@@ -52,7 +52,7 @@ class PodcastViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// Fetch episodes from the RSS feed for current podcast
+    /// Fetch episodes from the API for current podcast
     func fetchEpisodes() async {
         // Check cache first
         if let cached = episodesCache[currentPodcast.id], !cached.isEmpty {
@@ -64,7 +64,7 @@ class PodcastViewModel: ObservableObject {
         loadingState = .loading
 
         do {
-            let fetchedEpisodes = try await RSSService.shared.fetchEpisodes(from: currentPodcast.rssURL)
+            let fetchedEpisodes = try await APIService.shared.fetchEpisodes(for: currentPodcast.id)
             episodes = fetchedEpisodes
             episodesCache[currentPodcast.id] = fetchedEpisodes
             loadingState = .loaded
