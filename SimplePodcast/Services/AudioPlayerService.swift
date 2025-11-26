@@ -47,8 +47,48 @@ class AudioPlayerService: ObservableObject {
             try session.setCategory(.playback, mode: .default, options: [])
             try session.setActive(true)
             isAudioSessionConfigured = true
+
+            // Observe audio interruptions (e.g., when another app starts playing audio)
+            NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)
+                .sink { [weak self] notification in
+                    Task { @MainActor in
+                        self?.handleAudioInterruption(notification: notification)
+                    }
+                }
+                .store(in: &cancellables)
         } catch {
             print("Failed to setup audio session: \(error)")
+        }
+    }
+
+    /// Handle audio session interruption (e.g., when another app starts playing audio)
+    private func handleAudioInterruption(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+            return
+        }
+
+        switch type {
+        case .began:
+            // Another app started playing audio, pause our playback
+            if playbackState == .playing {
+                player?.pause()
+                playbackState = .paused
+                updateNowPlayingInfo()
+            }
+        case .ended:
+            // Interruption ended, check if we should resume
+            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) && playbackState == .paused {
+                    player?.play()
+                    playbackState = .playing
+                    updateNowPlayingInfo()
+                }
+            }
+        @unknown default:
+            break
         }
     }
 
