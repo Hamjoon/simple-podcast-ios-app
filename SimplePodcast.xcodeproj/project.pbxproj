@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		855212052ED729BC0088D09C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 855212042ED729BC0088D09C /* Localizable.xcstrings */; };
 		A1000001238F7B0100000001 /* SimplePodcastApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B0100000011 /* SimplePodcastApp.swift */; };
 		A1000001238F7B0100000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B0100000012 /* ContentView.swift */; };
 		A1000001238F7B0100000003 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B0100000013 /* PlayerView.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		855212042ED729BC0088D09C /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A1000001238F7B0100000010 /* SimplePodcast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimplePodcast.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000001238F7B0100000011 /* SimplePodcastApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePodcastApp.swift; sourceTree = "<group>"; };
 		A1000001238F7B0100000012 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 		A1000001238F7B0100000030 = {
 			isa = PBXGroup;
 			children = (
+				855212042ED729BC0088D09C /* Localizable.xcstrings */,
 				A1000001238F7B0100000031 /* SimplePodcast */,
 				A1000001238F7B0100000040 /* Products */,
 			);
@@ -189,6 +192,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = A1000001238F7B0100000030;
 			productRefGroup = A1000001238F7B0100000040 /* Products */;
@@ -205,6 +209,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				855212052ED729BC0088D09C /* Localizable.xcstrings in Resources */,
 				A1000001238F7B010000000C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -296,6 +301,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -354,6 +360,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
