@@ -29,6 +29,7 @@ class AudioPlayerService: ObservableObject {
     private var playerItem: AVPlayerItem?
     private var timeObserver: Any?
     private var cancellables = Set<AnyCancellable>()
+    private var interruptionCancellable: AnyCancellable?
     private var isAudioSessionConfigured = false
 
     // MARK: - Initialization
@@ -49,13 +50,12 @@ class AudioPlayerService: ObservableObject {
             isAudioSessionConfigured = true
 
             // Observe audio interruptions (e.g., when another app starts playing audio)
-            NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)
+            interruptionCancellable = NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)
                 .sink { [weak self] notification in
                     Task { @MainActor in
                         self?.handleAudioInterruption(notification: notification)
                     }
                 }
-                .store(in: &cancellables)
         } catch {
             print("Failed to setup audio session: \(error)")
         }
