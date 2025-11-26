@@ -11,27 +11,23 @@ struct EpisodeRowView: View {
 
     var body: some View {
         HStack(spacing: 15) {
-            // Episode thumbnail
-            AsyncImage(url: URL(string: episode.imageUrl)) { phase in
-                switch phase {
-                case .empty:
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                case .success(let image):
+            // Episode thumbnail with caching
+            CachedAsyncImage(
+                url: URL(string: episode.imageUrl),
+                content: { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                case .failure:
+                },
+                placeholder: {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
                         .overlay {
                             Image(systemName: "music.note")
                                 .foregroundColor(.gray)
                         }
-                @unknown default:
-                    EmptyView()
                 }
-            }
+            )
             .frame(width: 80, height: 80)
             .cornerRadius(8)
             .clipped()

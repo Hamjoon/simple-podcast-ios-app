@@ -29,6 +29,7 @@ class AudioPlayerService: ObservableObject {
     private var playerItem: AVPlayerItem?
     private var timeObserver: Any?
     private var cancellables = Set<AnyCancellable>()
+    private var interruptionCancellable: AnyCancellable?
     private var isAudioSessionConfigured = false
 
     // MARK: - Initialization
@@ -47,8 +48,47 @@ class AudioPlayerService: ObservableObject {
             try session.setCategory(.playback, mode: .default, options: [])
             try session.setActive(true)
             isAudioSessionConfigured = true
+
+            // Observe audio interruptions (e.g., when another app starts playing audio)
+            interruptionCancellable = NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)
+                .sink { [weak self] notification in
+                    Task { @MainActor in
+                        self?.handleAudioInterruption(notification: notification)
+                    }
+                }
         } catch {
             print("Failed to setup audio session: \(error)")
+        }
+    }
+
+    /// Handle audio session interruption (e.g., when another app starts playing audio)
+    private func handleAudioInterruption(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+            return
+        }
+
+        switch type {
+        case .began:
+            // Another app started playing audio, pause our playback
+            if playbackState == .playing {
+                player?.pause()
+                playbackState = .paused
+                updateNowPlayingInfo()
+            }
+        case .ended:
+            // Interruption ended, check if we should resume
+            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) && playbackState == .paused {
+                    player?.play()
+                    playbackState = .playing
+                    updateNowPlayingInfo()
+                }
+            }
+        @unknown default:
+            break
         }
     }
 
@@ -264,7 +304,7 @@ class AudioPlayerService: ObservableObject {
 
         var nowPlayingInfo = [String: Any]()
         nowPlayingInfo[MPMediaItemPropertyTitle] = episode.title
-        nowPlayingInfo[MPMediaItemPropertyArtist] = "Simple Podcast"
+        nowPlayingInfo[MPMediaItemPropertyArtist] = "Garibong Clip"
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = playbackState == .playing ? 1.0 : 0.0
