@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Flask API server for fetching and serving podcast RSS feed data.
-Fetches from: https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml
+Supports multiple podcasts with caching.
 """
 
 from flask import Flask, jsonify
@@ -14,14 +14,33 @@ import os
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# RSS feed URL
-RSS_FEED_URL = "https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml"
+# Podcast configurations
+PODCASTS = {
+    'film-club': {
+        'name': '필름클럽',
+        'subtitle': '김혜리의 필름클럽',
+        'rss_url': 'https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml'
+    },
+    'taste-of-travel': {
+        'name': '여행의 맛',
+        'subtitle': '노중훈의 여행의 맛',
+        'rss_url': 'https://rss.art19.com/TASTE'
+    },
+    'seodam': {
+        'name': '서담서담',
+        'subtitle': '책으로 읽는 내 마음',
+        'rss_url': 'https://rss.art19.com/SEODAM'
+    }
+}
 
-# Simple in-memory cache
+# Simple in-memory cache (per podcast)
 cache = {
-    'episodes': None,
-    'last_updated': None,
-    'cache_duration': 300  # 5 minutes in seconds
+    podcast_id: {
+        'episodes': None,
+        'last_updated': None,
+        'cache_duration': 300  # 5 minutes in seconds
+    }
+    for podcast_id in PODCASTS.keys()
 }
 
 def parse_duration(duration_str):
@@ -43,16 +62,28 @@ def parse_duration(duration_str):
     except:
         return "00:00:00"
 
-def fetch_rss_feed():
-    """Fetch and parse the RSS feed"""
+def fetch_rss_feed(podcast_id):
+    """Fetch and parse the RSS feed for a specific podcast"""
+    if podcast_id not in PODCASTS:
+        return []
+
+    rss_url = PODCASTS[podcast_id]['rss_url']
+
     try:
-        print(f"Fetching RSS feed from {RSS_FEED_URL}...")
-        feed = feedparser.parse(RSS_FEED_URL)
+        print(f"Fetching RSS feed for {podcast_id} from {rss_url}...")
+        feed = feedparser.parse(rss_url)
 
         if feed.bozo:
             print(f"Warning: Feed has parsing issues: {feed.bozo_exception}")
 
         episodes = []
+
+        # Get channel image URL as fallback
+        channel_image_url = ''
+        if hasattr(feed.feed, 'image') and hasattr(feed.feed.image, 'href'):
+            channel_image_url = feed.feed.image.href
+        elif hasattr(feed.feed, 'itunes_image'):
+            channel_image_url = feed.feed.itunes_image.get('href', '')
 
         for idx, entry in enumerate(feed.entries, start=1):
             # Extract episode information
@@ -66,12 +97,19 @@ def fetch_rss_feed():
                 'pubDate': entry.get('published', '')
             }
 
+            # Clean HTML from description
+            if episode['description']:
+                import re
+                episode['description'] = re.sub('<[^<]+?>', '', episode['description']).strip()
+
             # Extract audio URL from enclosures
             if hasattr(entry, 'enclosures') and entry.enclosures:
                 for enclosure in entry.enclosures:
-                    if 'audio' in enclosure.get('type', ''):
-                        episode['audioUrl'] = enclosure.get('href', '')
-                        break
+                    enc_type = enclosure.get('type', '')
+                    if 'audio' in enc_type or enc_type == '':
+                        episode['audioUrl'] = enclosure.get('href', enclosure.get('url', ''))
+                        if episode['audioUrl']:
+                            break
 
             # Fallback: check for media content
             if not episode['audioUrl'] and hasattr(entry, 'media_content'):
@@ -81,12 +119,16 @@ def fetch_rss_feed():
                         break
 
             # Extract image URL
-            if hasattr(entry, 'image'):
+            if hasattr(entry, 'itunes_image'):
+                episode['imageUrl'] = entry.itunes_image.get('href', '')
+            elif hasattr(entry, 'image'):
                 episode['imageUrl'] = entry.image.get('href', '')
             elif hasattr(entry, 'media_thumbnail') and entry.media_thumbnail:
                 episode['imageUrl'] = entry.media_thumbnail[0].get('url', '')
-            elif hasattr(feed.feed, 'image'):
-                episode['imageUrl'] = feed.feed.image.get('href', '')
+
+            # Use channel image as fallback
+            if not episode['imageUrl']:
+                episode['imageUrl'] = channel_image_url
 
             # Extract duration
             if hasattr(entry, 'itunes_duration'):
@@ -94,38 +136,85 @@ def fetch_rss_feed():
 
             episodes.append(episode)
 
-        print(f"Successfully parsed {len(episodes)} episodes")
+        print(f"Successfully parsed {len(episodes)} episodes for {podcast_id}")
         return episodes
 
     except Exception as e:
-        print(f"Error fetching RSS feed: {e}")
+        print(f"Error fetching RSS feed for {podcast_id}: {e}")
         return []
 
-def get_cached_episodes():
+def get_cached_episodes(podcast_id):
     """Get episodes from cache or fetch new ones"""
+    if podcast_id not in cache:
+        return []
+
     current_time = time.time()
+    podcast_cache = cache[podcast_id]
 
     # Check if cache is valid
-    if (cache['episodes'] is not None and
-        cache['last_updated'] is not None and
-        current_time - cache['last_updated'] < cache['cache_duration']):
-        print("Returning cached episodes")
-        return cache['episodes']
+    if (podcast_cache['episodes'] is not None and
+        podcast_cache['last_updated'] is not None and
+        current_time - podcast_cache['last_updated'] < podcast_cache['cache_duration']):
+        print(f"Returning cached episodes for {podcast_id}")
+        return podcast_cache['episodes']
 
     # Fetch new data
-    episodes = fetch_rss_feed()
+    episodes = fetch_rss_feed(podcast_id)
 
     # Update cache
-    cache['episodes'] = episodes
-    cache['last_updated'] = current_time
+    podcast_cache['episodes'] = episodes
+    podcast_cache['last_updated'] = current_time
 
     return episodes
 
+@app.route('/api/podcasts', methods=['GET'])
+def get_podcasts():
+    """API endpoint to get list of available podcasts"""
+    podcasts = [
+        {
+            'id': podcast_id,
+            'name': config['name'],
+            'subtitle': config['subtitle']
+        }
+        for podcast_id, config in PODCASTS.items()
+    ]
+    return jsonify({
+        'success': True,
+        'podcasts': podcasts
+    })
+
+@app.route('/api/episodes/<podcast_id>', methods=['GET'])
+def get_episodes_by_podcast(podcast_id):
+    """API endpoint to get episodes for a specific podcast"""
+    if podcast_id not in PODCASTS:
+        return jsonify({
+            'success': False,
+            'error': f'Unknown podcast: {podcast_id}'
+        }), 404
+
+    try:
+        episodes = get_cached_episodes(podcast_id)
+        return jsonify({
+            'success': True,
+            'podcast': {
+                'id': podcast_id,
+                'name': PODCASTS[podcast_id]['name'],
+                'subtitle': PODCASTS[podcast_id]['subtitle']
+            },
+            'episodes': episodes,
+            'count': len(episodes)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/episodes', methods=['GET'])
 def get_episodes():
-    """API endpoint to get all podcast episodes"""
+    """API endpoint to get all podcast episodes (default: film-club for backwards compatibility)"""
     try:
-        episodes = get_cached_episodes()
+        episodes = get_cached_episodes('film-club')
         return jsonify({
             'success': True,
             'episodes': episodes,
@@ -150,19 +239,22 @@ def index():
     """Root endpoint with API information"""
     return jsonify({
         'name': 'Simple Podcast API',
-        'version': '1.0.0',
+        'version': '2.0.0',
         'endpoints': {
-            '/api/episodes': 'Get all podcast episodes',
+            '/api/podcasts': 'Get list of available podcasts',
+            '/api/episodes/<podcast_id>': 'Get episodes for a specific podcast',
+            '/api/episodes': 'Get episodes (default: film-club)',
             '/api/health': 'Health check'
-        }
+        },
+        'available_podcasts': list(PODCASTS.keys())
     })
 
 if __name__ == '__main__':
     print("Starting Flask server...")
-    print(f"RSS Feed URL: {RSS_FEED_URL}")
-    
+    print(f"Available podcasts: {list(PODCASTS.keys())}")
+
     # Get port from environment variable (Railway sets this) or default to 5001
     port = int(os.environ.get('PORT', 5001))
     debug = os.environ.get('FLASK_ENV') != 'production'
-    
+
     app.run(host='0.0.0.0', port=port, debug=debug)
