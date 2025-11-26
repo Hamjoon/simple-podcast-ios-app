@@ -1,0 +1,8 @@
+/*
+  Localizable.strings (Korean)
+  SimplePodcast
+*/
+
+/* Header View */
+"header.title" = "Garibong Clip";
+"header.subtitle" = "영화와 책, 그리고 여행에 대한 이야기들";
