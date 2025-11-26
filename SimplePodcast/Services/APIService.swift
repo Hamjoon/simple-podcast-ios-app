@@ -4,7 +4,7 @@ import Foundation
 actor APIService {
     static let shared = APIService()
 
-    private let baseURL = "https://simple-podcast-production.up.railway.app"
+    private let baseURL = "https://web-production-65db2.up.railway.app"
     private let decoder: JSONDecoder
 
     private init() {
