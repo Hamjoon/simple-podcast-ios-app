@@ -68,7 +68,7 @@ struct NowPlayingSection: View {
 
             // Episode info
             VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.audioPlayer.currentEpisode?.title ?? "Select an episode")
+                Text(viewModel.audioPlayer.currentEpisode?.title ?? String(localized: "Select an episode"))
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(.primary)
                     .lineLimit(2)
