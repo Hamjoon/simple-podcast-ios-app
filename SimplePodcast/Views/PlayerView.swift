@@ -102,11 +102,16 @@ struct AudioControlsView: View {
                     ),
                     in: 0...1,
                     onEditingChanged: { editing in
-                        isDragging = editing
-                        if !editing {
+                        if editing {
+                            isDragging = true
+                        } else {
                             // Seek only when drag ends
                             let newTime = dragValue * viewModel.audioPlayer.duration
                             viewModel.audioPlayer.seek(to: newTime)
+                            // Delay switching back to progress to avoid visual jump
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                isDragging = false
+                            }
                         }
                     }
                 )
