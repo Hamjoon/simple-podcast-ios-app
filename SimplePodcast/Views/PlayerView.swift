@@ -86,6 +86,8 @@ struct NowPlayingSection: View {
 /// Audio controls with play/pause and progress slider
 struct AudioControlsView: View {
     @EnvironmentObject var viewModel: PodcastViewModel
+    @State private var isDragging = false
+    @State private var dragValue: Double = 0
 
     var body: some View {
         VStack(spacing: 12) {
@@ -93,20 +95,32 @@ struct AudioControlsView: View {
             VStack(spacing: 4) {
                 Slider(
                     value: Binding(
-                        get: { viewModel.audioPlayer.progress },
+                        get: { isDragging ? dragValue : viewModel.audioPlayer.progress },
                         set: { newValue in
-                            let newTime = newValue * viewModel.audioPlayer.duration
-                            viewModel.audioPlayer.seek(to: newTime)
+                            dragValue = newValue
                         }
                     ),
-                    in: 0...1
+                    in: 0...1,
+                    onEditingChanged: { editing in
+                        if editing {
+                            isDragging = true
+                        } else {
+                            // Seek only when drag ends
+                            let newTime = dragValue * viewModel.audioPlayer.duration
+                            viewModel.audioPlayer.seek(to: newTime)
+                            // Delay switching back to progress to avoid visual jump
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                isDragging = false
+                            }
+                        }
+                    }
                 )
                 .accentColor(.primaryGradientStart)
                 .disabled(viewModel.audioPlayer.currentEpisode == nil)
 
                 // Time labels
                 HStack {
-                    Text(formatTime(viewModel.audioPlayer.currentTime))
+                    Text(formatTime(isDragging ? dragValue * viewModel.audioPlayer.duration : viewModel.audioPlayer.currentTime))
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(.secondary)
 

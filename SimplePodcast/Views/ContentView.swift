@@ -46,11 +46,11 @@ struct ContentView: View {
 struct HeaderView: View {
     var body: some View {
         VStack(spacing: 10) {
-            Text("Simple Podcast")
+            Text("header.title")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
 
-            Text("Your favorite podcast player")
+            Text("header.subtitle")
                 .font(.system(size: 16))
                 .foregroundColor(.white.opacity(0.9))
         }
