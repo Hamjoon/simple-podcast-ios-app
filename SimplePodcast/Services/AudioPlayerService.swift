@@ -29,21 +29,24 @@ class AudioPlayerService: ObservableObject {
     private var playerItem: AVPlayerItem?
     private var timeObserver: Any?
     private var cancellables = Set<AnyCancellable>()
+    private var isAudioSessionConfigured = false
 
     // MARK: - Initialization
 
     private init() {
-        setupAudioSession()
         setupRemoteCommandCenter()
     }
 
     // MARK: - Audio Session Setup
 
     private func setupAudioSession() {
+        guard !isAudioSessionConfigured else { return }
+
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .default, options: [])
             try session.setActive(true)
+            isAudioSessionConfigured = true
         } catch {
             print("Failed to setup audio session: \(error)")
         }
@@ -102,6 +105,9 @@ class AudioPlayerService: ObservableObject {
 
         // Stop current playback
         stop()
+
+        // Setup audio session on first playback
+        setupAudioSession()
 
         currentEpisode = episode
         playbackState = .loading

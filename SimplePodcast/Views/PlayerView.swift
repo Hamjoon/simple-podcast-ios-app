@@ -25,19 +25,34 @@ struct NowPlayingSection: View {
     var body: some View {
         HStack(spacing: 20) {
             // Episode artwork
-            AsyncImage(url: URL(string: viewModel.audioPlayer.currentEpisode?.imageUrl ?? "")) { phase in
-                switch phase {
-                case .empty:
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .overlay {
-                            ProgressView()
+            Group {
+                if let imageUrl = viewModel.audioPlayer.currentEpisode?.imageUrl,
+                   let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .overlay {
+                                    ProgressView()
+                                }
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        case .failure:
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .overlay {
+                                    Image(systemName: "music.note")
+                                        .font(.largeTitle)
+                                        .foregroundColor(.gray)
+                                }
+                        @unknown default:
+                            EmptyView()
                         }
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                case .failure:
+                    }
+                } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
                         .overlay {
@@ -45,8 +60,6 @@ struct NowPlayingSection: View {
                                 .font(.largeTitle)
                                 .foregroundColor(.gray)
                         }
-                @unknown default:
-                    EmptyView()
                 }
             }
             .frame(width: 120, height: 120)
