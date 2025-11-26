@@ -62,6 +62,31 @@ def parse_duration(duration_str):
     except:
         return "00:00:00"
 
+def format_pubdate(pubdate_str):
+    """Convert pubDate string to YYYY.MM.DD format for display"""
+    if not pubdate_str:
+        return ""
+
+    try:
+        from email.utils import parsedate_to_datetime
+        dt = parsedate_to_datetime(pubdate_str)
+        return dt.strftime("%Y.%m.%d")
+    except:
+        try:
+            # Try alternative parsing methods
+            for fmt in ["%a, %d %b %Y %H:%M:%S %z", "%a, %d %b %Y %H:%M:%S %Z", "%Y-%m-%dT%H:%M:%S"]:
+                try:
+                    dt = datetime.strptime(pubdate_str.strip(), fmt)
+                    return dt.strftime("%Y.%m.%d")
+                except:
+                    continue
+        except:
+            pass
+    return pubdate_str
+
+# Podcasts that don't have itunes:duration and should use pubDate instead
+PODCASTS_USE_PUBDATE = {'taste-of-travel', 'seodam'}
+
 def fetch_rss_feed(podcast_id):
     """Fetch and parse the RSS feed for a specific podcast"""
     if podcast_id not in PODCASTS:
@@ -131,7 +156,10 @@ def fetch_rss_feed(podcast_id):
                 episode['imageUrl'] = channel_image_url
 
             # Extract duration
-            if hasattr(entry, 'itunes_duration'):
+            # For podcasts without itunes:duration, use formatted pubDate instead
+            if podcast_id in PODCASTS_USE_PUBDATE:
+                episode['duration'] = format_pubdate(episode['pubDate'])
+            elif hasattr(entry, 'itunes_duration'):
                 episode['duration'] = parse_duration(entry.itunes_duration)
 
             episodes.append(episode)
