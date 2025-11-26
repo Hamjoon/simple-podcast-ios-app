@@ -22,6 +22,9 @@
 		A1000001238F7B010000000C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B010000001C /* Assets.xcassets */; };
 		A1000001238F7B010000000D /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B010000001E /* ImageCache.swift */; };
 		A1000001238F7B010000000E /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B010000001F /* CachedAsyncImage.swift */; };
+		A1000001238F7B0100000020 /* Podcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B0100000021 /* Podcast.swift */; };
+		A1000001238F7B0100000022 /* RSSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B0100000023 /* RSSService.swift */; };
+		A1000001238F7B0100000024 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001238F7B0100000025 /* MainTabView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +45,9 @@
 		A1000001238F7B010000001D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000001238F7B010000001E /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		A1000001238F7B010000001F /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
+		A1000001238F7B0100000021 /* Podcast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Podcast.swift; sourceTree = "<group>"; };
+		A1000001238F7B0100000023 /* RSSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSSService.swift; sourceTree = "<group>"; };
+		A1000001238F7B0100000025 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000001238F7B0100000017 /* Episode.swift */,
+				A1000001238F7B0100000021 /* Podcast.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -99,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000001238F7B0100000012 /* ContentView.swift */,
+				A1000001238F7B0100000025 /* MainTabView.swift */,
 				A1000001238F7B0100000013 /* PlayerView.swift */,
 				A1000001238F7B0100000014 /* EpisodeListView.swift */,
 				A1000001238F7B0100000015 /* EpisodeRowView.swift */,
@@ -121,6 +129,7 @@
 			children = (
 				A1000001238F7B0100000019 /* APIService.swift */,
 				A1000001238F7B010000001A /* AudioPlayerService.swift */,
+				A1000001238F7B0100000023 /* RSSService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -223,14 +232,17 @@
 			files = (
 				A1000001238F7B0100000001 /* SimplePodcastApp.swift in Sources */,
 				A1000001238F7B0100000002 /* ContentView.swift in Sources */,
+				A1000001238F7B0100000024 /* MainTabView.swift in Sources */,
 				A1000001238F7B0100000003 /* PlayerView.swift in Sources */,
 				A1000001238F7B0100000004 /* EpisodeListView.swift in Sources */,
 				A1000001238F7B0100000005 /* EpisodeRowView.swift in Sources */,
 				A1000001238F7B0100000006 /* SleepTimerView.swift in Sources */,
 				A1000001238F7B0100000007 /* Episode.swift in Sources */,
+				A1000001238F7B0100000020 /* Podcast.swift in Sources */,
 				A1000001238F7B0100000008 /* PodcastViewModel.swift in Sources */,
 				A1000001238F7B0100000009 /* APIService.swift in Sources */,
 				A1000001238F7B010000000A /* AudioPlayerService.swift in Sources */,
+				A1000001238F7B0100000022 /* RSSService.swift in Sources */,
 				A1000001238F7B010000000B /* SleepTimerManager.swift in Sources */,
 				A1000001238F7B010000000D /* ImageCache.swift in Sources */,
 				A1000001238F7B010000000E /* CachedAsyncImage.swift in Sources */,

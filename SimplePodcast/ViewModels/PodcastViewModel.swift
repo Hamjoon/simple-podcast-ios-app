@@ -17,6 +17,7 @@ class PodcastViewModel: ObservableObject {
 
     @Published private(set) var episodes: [Episode] = []
     @Published private(set) var loadingState: LoadingState = .idle
+    @Published var currentPodcast: Podcast
 
     // MARK: - Services
 
@@ -26,10 +27,12 @@ class PodcastViewModel: ObservableObject {
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
+    private var episodesCache: [String: [Episode]] = [:]
 
     // MARK: - Initialization
 
-    init() {
+    init(podcast: Podcast = .filmClub) {
+        self.currentPodcast = podcast
         self.audioPlayer = AudioPlayerService.shared
         self.sleepTimer = SleepTimerManager.shared
 
@@ -49,17 +52,46 @@ class PodcastViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// Fetch episodes from the API
+    /// Fetch episodes from the RSS feed for current podcast
     func fetchEpisodes() async {
+        // Check cache first
+        if let cached = episodesCache[currentPodcast.id], !cached.isEmpty {
+            episodes = cached
+            loadingState = .loaded
+            return
+        }
+
         loadingState = .loading
 
         do {
-            let fetchedEpisodes = try await APIService.shared.fetchEpisodes()
+            let fetchedEpisodes = try await RSSService.shared.fetchEpisodes(from: currentPodcast.rssURL)
             episodes = fetchedEpisodes
+            episodesCache[currentPodcast.id] = fetchedEpisodes
             loadingState = .loaded
         } catch {
             loadingState = .error(error.localizedDescription)
         }
+    }
+
+    /// Switch to a different podcast
+    func switchPodcast(to podcast: Podcast) {
+        guard podcast.id != currentPodcast.id else { return }
+        currentPodcast = podcast
+
+        // Load cached episodes or reset state
+        if let cached = episodesCache[podcast.id], !cached.isEmpty {
+            episodes = cached
+            loadingState = .loaded
+        } else {
+            episodes = []
+            loadingState = .idle
+        }
+    }
+
+    /// Refresh episodes by clearing cache
+    func refreshEpisodes() async {
+        episodesCache[currentPodcast.id] = nil
+        await fetchEpisodes()
     }
 
     /// Play a specific episode
