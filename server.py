@@ -24,12 +24,12 @@ PODCASTS = {
     'taste-of-travel': {
         'name': '여행의 맛',
         'subtitle': '노중훈의 여행의 맛',
-        'rss_url': 'https://rss.art19.com/TASTE'
+        'rss_url': 'https://minicast.imbc.com/PodCast/pod.aspx?code=1000621100000100000'
     },
     'seodam': {
         'name': '서담서담',
         'subtitle': '책으로 읽는 내 마음',
-        'rss_url': 'https://rss.art19.com/SEODAM'
+        'rss_url': 'https://minicast.imbc.com/PodCast/pod.aspx?code=1004084100000100000'
     }
 }
 
