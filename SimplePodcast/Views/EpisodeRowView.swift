@@ -46,8 +46,8 @@ struct EpisodeRowView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            // Duration
-            Text(episode.duration)
+            // Publish Date
+            Text(episode.formattedPubDate)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(isCurrentEpisode ? .white.opacity(0.9) : Color.gray)
         }
@@ -70,7 +70,8 @@ struct EpisodeRowView: View {
             description: "This is a sample episode description that might be quite long.",
             audioUrl: "https://example.com/audio.mp3",
             imageUrl: "https://example.com/image.jpg",
-            duration: "45:30"
+            duration: "45:30",
+            pubDate: "Mon, 25 Nov 2024 10:00:00 +0900"
         ))
     }
     .padding()
