@@ -34,6 +34,17 @@ class PodcastViewModel: ObservableObject {
         self.sleepTimer = SleepTimerManager.shared
 
         setupAutoPlayNext()
+        setupAudioPlayerObservation()
+    }
+
+    /// Forward AudioPlayerService changes to trigger view updates
+    private func setupAudioPlayerObservation() {
+        audioPlayer.objectWillChange
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Public Methods
