@@ -18,3 +18,5 @@ __pycache__/
 .idea/
 *.swp
 *.swo
+
+ml/movie/data/
