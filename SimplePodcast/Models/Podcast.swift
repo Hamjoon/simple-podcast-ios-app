@@ -27,11 +27,11 @@ extension Podcast {
         gradientColors: (start: "667eea", end: "764ba2")
     )
 
-    static let tasteOfTravel = Podcast(
-        id: "taste-of-travel",
-        name: "여행의 맛",
-        subtitle: "노중훈의 여행의 맛",
-        iconName: "airplane",
+    static let radioBookClub = Podcast(
+        id: "radio-book-club",
+        name: "라디오 북클럽",
+        subtitle: "MBC 라디오 북클럽",
+        iconName: "headphones",
         gradientColors: (start: "11998e", end: "38ef7d")
     )
 
@@ -43,5 +43,5 @@ extension Podcast {
         gradientColors: (start: "ee9ca7", end: "ffdde1")
     )
 
-    static let allPodcasts: [Podcast] = [.filmClub, .tasteOfTravel, .seodam]
+    static let allPodcasts: [Podcast] = [.filmClub, .radioBookClub, .seodam]
 }
