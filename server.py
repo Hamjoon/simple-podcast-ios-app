@@ -21,10 +21,10 @@ PODCASTS = {
         'subtitle': '김혜리의 필름클럽',
         'rss_url': 'https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml'
     },
-    'taste-of-travel': {
-        'name': '여행의 맛',
-        'subtitle': '노중훈의 여행의 맛',
-        'rss_url': 'https://minicast.imbc.com/PodCast/pod.aspx?code=1000621100000100000'
+    'radio-book-club': {
+        'name': '라디오 북클럽',
+        'subtitle': 'MBC 라디오 북클럽',
+        'rss_url': 'https://minicast.imbc.com/PodCast/pod.aspx?code=1000698100000100000'
     },
     'seodam': {
         'name': '서담서담',
