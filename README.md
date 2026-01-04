@@ -7,7 +7,7 @@ SBS 팟캐스트를 스트리밍하는 iOS 앱입니다.
 | 팟캐스트 | 설명 |
 |---------|------|
 | 김혜리의 필름클럽 | 영화 리뷰 및 토론 |
-| 노중훈의 여행의 맛 | 여행 이야기 |
+| 라디오 북클럽 | MBC 라디오 북클럽 |
 | 서담서담 | 책으로 읽는 내 마음 |
 
 ## Features
@@ -58,7 +58,7 @@ SimplePodcast/
 
 팟캐스트 에피소드는 Railway에 배포된 백엔드 API에서 가져옵니다:
 - API: `https://web-production-65db2.up.railway.app/api/episodes/{podcast-id}`
-- 지원 ID: `film-club`, `taste-of-travel`, `seodam`
+- 지원 ID: `film-club`, `radio-book-club`, `seodam`
 
 ## Getting Started
 
