@@ -11,45 +11,47 @@ struct EpisodeRowView: View {
 
     var body: some View {
         HStack(spacing: 15) {
-            // Episode thumbnail with caching
-            CachedAsyncImage(
-                url: URL(string: episode.imageUrl),
-                content: { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                },
-                placeholder: {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .overlay {
-                            Image(systemName: "music.note")
-                                .foregroundColor(.gray)
-                        }
-                }
-            )
-            .frame(width: 80, height: 80)
-            .cornerRadius(8)
-            .clipped()
+            // Episode thumbnail with publish date below
+            VStack(spacing: 6) {
+                CachedAsyncImage(
+                    url: URL(string: episode.imageUrl),
+                    content: { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    },
+                    placeholder: {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .overlay {
+                                Image(systemName: "music.note")
+                                    .foregroundColor(.gray)
+                            }
+                    }
+                )
+                .frame(width: 70, height: 70)
+                .cornerRadius(8)
+                .clipped()
+
+                // Publish Date
+                Text(episode.formattedPubDate)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(isCurrentEpisode ? .white.opacity(0.9) : Color.gray)
+            }
 
             // Episode details
             VStack(alignment: .leading, spacing: 5) {
                 Text(episode.title)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(isCurrentEpisode ? .white : .primary)
-                    .lineLimit(1)
+                    .lineLimit(2)
 
                 Text(episode.description)
                     .font(.system(size: 13))
                     .foregroundColor(isCurrentEpisode ? .white.opacity(0.9) : .secondary)
-                    .lineLimit(2)
+                    .lineLimit(3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            // Publish Date
-            Text(episode.formattedPubDate)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(isCurrentEpisode ? .white.opacity(0.9) : Color.gray)
         }
         .padding(15)
         .background(
