@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A simple iOS podcast application for "김혜리의 필름클럽" (Kim Hye-ri's Film Club). The app fetches podcast episodes from an external RSS feed and provides audio playback functionality.
+A simple iOS podcast application for "김혜리의 필름클럽(film-club), 라디오 북클럽(radio-book-club), 서담서담(seodam)".
+The app fetches podcast episodes from an external RSS feed and provides audio playback functionality.
 
 ## Architecture
 
@@ -23,7 +24,9 @@ A simple iOS podcast application for "김혜리의 필름클럽" (Kim Hye-ri's F
 ### Data Source
 
 Podcast episodes are fetched from the SBS RSS feed:
-- URL: `https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml`
+- URL(film-club): `https://wizard2.sbs.co.kr/w3/podcast/V2000010143.xml`
+- URL(radio-book-club): `https://minicast.imbc.com/PodCast/pod.aspx?code=1000698100000100000`
+- URL(seodam): `https://minicast.imbc.com/PodCast/pod.aspx?code=1004084100000100000`
 - Contains episode metadata: title, description, audio URL, image URL, duration, publish date
 
 ### Key Features
