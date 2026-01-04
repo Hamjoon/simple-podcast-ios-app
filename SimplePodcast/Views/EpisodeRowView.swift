@@ -9,47 +9,63 @@ struct EpisodeRowView: View {
         viewModel.isCurrentEpisode(episode)
     }
 
+    /// Returns description if available, otherwise extracts text after first colon from title
+    private var displayDescription: String {
+        let trimmedDescription = episode.description.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedDescription.isEmpty {
+            return episode.description
+        }
+        // Extract text after first colon, or use entire title if no colon
+        if let colonIndex = episode.title.firstIndex(of: ":") {
+            let afterColon = episode.title[episode.title.index(after: colonIndex)...]
+            return String(afterColon).trimmingCharacters(in: .whitespaces)
+        }
+        return episode.title
+    }
+
     var body: some View {
         HStack(spacing: 15) {
-            // Episode thumbnail with caching
-            CachedAsyncImage(
-                url: URL(string: episode.imageUrl),
-                content: { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                },
-                placeholder: {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .overlay {
-                            Image(systemName: "music.note")
-                                .foregroundColor(.gray)
-                        }
-                }
-            )
-            .frame(width: 80, height: 80)
-            .cornerRadius(8)
-            .clipped()
+            // Episode thumbnail with publish date below
+            VStack(spacing: 6) {
+                CachedAsyncImage(
+                    url: URL(string: episode.imageUrl),
+                    content: { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    },
+                    placeholder: {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .overlay {
+                                Image(systemName: "music.note")
+                                    .foregroundColor(.gray)
+                            }
+                    }
+                )
+                .frame(width: 70, height: 70)
+                .cornerRadius(8)
+                .clipped()
+
+                // Publish Date
+                Text(episode.formattedPubDate)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(isCurrentEpisode ? .white.opacity(0.9) : Color.gray)
+            }
 
             // Episode details
             VStack(alignment: .leading, spacing: 5) {
                 Text(episode.title)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(isCurrentEpisode ? .white : .primary)
-                    .lineLimit(1)
+                    .lineLimit(2)
 
-                Text(episode.description)
+                Text(displayDescription)
                     .font(.system(size: 13))
                     .foregroundColor(isCurrentEpisode ? .white.opacity(0.9) : .secondary)
-                    .lineLimit(2)
+                    .lineLimit(3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            // Publish Date
-            Text(episode.formattedPubDate)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(isCurrentEpisode ? .white.opacity(0.9) : Color.gray)
         }
         .padding(15)
         .background(
