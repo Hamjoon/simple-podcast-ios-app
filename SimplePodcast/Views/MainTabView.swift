@@ -49,6 +49,8 @@ struct PodcastTabContent: View {
                     // Main content card
                     VStack(spacing: 30) {
                         PlayerView()
+                        BannerAdView()
+                            .frame(height: 50)
                         EpisodeListView()
                     }
                     .padding(20)
