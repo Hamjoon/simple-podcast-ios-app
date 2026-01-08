@@ -7,6 +7,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A simple iOS podcast application for "김혜리의 필름클럽(film-club), 라디오 북클럽(radio-book-club), 서담서담(seodam)".
 The app fetches podcast episodes from an external RSS feed and provides audio playback functionality.
 
+## Rules for implementation
+
+- create a work branch from develop before starting to implement
+- commit and push to the work branch
+- create a pull request to merge the work branch into develop
+- manually merge the pull request
+
+
 ## Architecture
 
 ### Target Platform
