@@ -13,6 +13,12 @@ struct MainTabView: View {
                     }
                     .tag(podcast.id)
             }
+
+            SearchView(selectedTab: $selectedTab)
+                .tabItem {
+                    Label("검색", systemImage: "magnifyingglass")
+                }
+                .tag("search")
         }
         .tint(Color.primaryGradientStart)
     }
@@ -49,6 +55,8 @@ struct PodcastTabContent: View {
                     // Main content card
                     VStack(spacing: 30) {
                         PlayerView()
+                        BannerAdView()
+                            .frame(height: 50)
                         EpisodeListView()
                     }
                     .padding(20)
