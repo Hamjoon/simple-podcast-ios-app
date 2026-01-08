@@ -49,6 +49,26 @@ actor APIService {
     func fetchEpisodes() async throws -> [Episode] {
         return try await fetchEpisodes(for: "film-club")
     }
+
+    /// Fetches episodes from all podcasts concurrently
+    /// - Returns: Dictionary mapping podcast ID to episodes array
+    /// - Throws: APIError if any request fails
+    func fetchAllEpisodes() async throws -> [String: [Episode]] {
+        try await withThrowingTaskGroup(of: (String, [Episode]).self) { group in
+            for podcast in Podcast.allPodcasts {
+                group.addTask {
+                    let episodes = try await self.fetchEpisodes(for: podcast.id)
+                    return (podcast.id, episodes)
+                }
+            }
+
+            var results: [String: [Episode]] = [:]
+            for try await (podcastId, episodes) in group {
+                results[podcastId] = episodes
+            }
+            return results
+        }
+    }
 }
 
 /// Errors that can occur during API calls

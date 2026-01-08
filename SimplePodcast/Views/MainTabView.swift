@@ -13,6 +13,12 @@ struct MainTabView: View {
                     }
                     .tag(podcast.id)
             }
+
+            SearchView(selectedTab: $selectedTab)
+                .tabItem {
+                    Label("검색", systemImage: "magnifyingglass")
+                }
+                .tag("search")
         }
         .tint(Color.primaryGradientStart)
     }
